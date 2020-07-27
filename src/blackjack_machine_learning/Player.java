@@ -37,4 +37,8 @@ public class Player {
 		money -= bet;
 		bet = 0;
 	}
+	
+	public int getMoney() {
+		return money;
+	}
 }
