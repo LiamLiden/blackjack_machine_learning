@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class NeuronLayer {
 	public ArrayList<Neuron> neurons;
 	
-	public NeuronLayer() {
-		this.neurons = new ArrayList<Neuron>();
+	public NeuronLayer(ArrayList<Neuron> layer) {
+		this.neurons = layer;
 	}
 }
