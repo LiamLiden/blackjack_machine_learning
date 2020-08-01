@@ -37,4 +37,8 @@ public class Deck {
 	public void shuffle() {
 		Collections.shuffle(cards);
 	}
+	
+	public void clearDeck() {
+		cards.clear();
+	}
 }

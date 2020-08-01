@@ -41,4 +41,9 @@ public class Player {
 	public int getMoney() {
 		return money;
 	}
+	
+	public void discardCards(Deck discard) {
+		discard.addCards(cards);
+		cards.clear();
+	}
 }
