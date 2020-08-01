@@ -37,14 +37,9 @@ public class NeuralNetwork {
 	}
 	
 	// Result is equal to 1, .5, or 0 if the play won, tied, or lost respectively.
-	public void backpropogate(double result, double learningRate) {
-		for(Neuron node : outputNodes) {
-			total++;
-			if((node.getActivationAdjusted() > .5 && result > .5) || (node.getActivationAdjusted() < .5 && result < .5) || (node.getActivationAdjusted() == result))
-				success++;
-			
-			node.backpropogate(node.getError(result), learningRate);
-		}
+	public void backpropogate(int outputNodeIndex, double trueResult, double learningRate) {
+		Neuron outputNode = outputNodes.get(outputNodeIndex);
+		outputNode.backpropogate(outputNode.getError(trueResult), learningRate);
 	}
 	
 	public double getAccuracy() {

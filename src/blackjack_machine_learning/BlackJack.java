@@ -6,8 +6,12 @@ import java.util.List;
 
 public class BlackJack {
 	private static final double LEARNING_RATE = 1;
+	private static final double NUMBER_OF_DECKS = 6;
 	private static LinkedList<Card> dealer = new LinkedList<Card>();
 
+	private static int targetOutputNodeIndex;
+	private static double trueResult;
+	
 	public static void main(String[] args) {
 		// Setup neural network
 		ArrayList<Neuron> inputNodes = new ArrayList<Neuron>();
@@ -31,19 +35,23 @@ public class BlackJack {
 
 		// Setup players
 		ArrayList<Player> players = new ArrayList<Player>();
-		players.add(new Player(100));
+		players.add(new Player(0));
 
 		// Setup deck and discard
 		Deck deck = new Deck();
-		deck.initializeDeck();
+		for (int i = 0; i < NUMBER_OF_DECKS; i++) {
+			Deck tempDeck = new Deck();
+			tempDeck.initializeDeck();
+			deck.addCards(tempDeck.getCards());
+		}
 		deck.shuffle();
 		Deck discard = new Deck();
 
-		for (int i = 0; i < 100000; i++) {
+		for (int i = 0; i < 1000000; i++) {
 
 			// Player bets
 			for (Player p : players) {
-				p.bet(10);
+				p.bet(1);
 			}
 
 			// Deal 2 cards to each player and dealer
@@ -56,14 +64,16 @@ public class BlackJack {
 				ArrayList<Double> inputs = new ArrayList<Double>();
 				inputs.add((double) dealerCardValue());
 				inputs.add((double) players.get(0).cardsValue());
-				ArrayList<Double> results = network.forwardpropogate(inputs);
-				if (results.get(0) > results.get(1)) {
+				ArrayList<Double> estimates = network.forwardpropogate(inputs);
+				if (estimates.get(0) > estimates.get(1)) {
+					targetOutputNodeIndex = 0;
 					players.get(0).hit(deck);
 					System.out.println("HIT");
 					if (players.get(0).cardsValue() <= 21) {
-						network.backpropogate(1, LEARNING_RATE);
+						network.backpropogate(targetOutputNodeIndex, 1, LEARNING_RATE);
 					}
 				} else {
+					targetOutputNodeIndex = 1;
 					break;
 				}
 			}
@@ -80,15 +90,19 @@ public class BlackJack {
 				int dealerValue = dealerCardValue();
 				if (playerValue > 21 || (dealerValue > playerValue && dealerValue <= 21)) {
 					p.loseBet();
-					network.backpropogate(0, LEARNING_RATE);
+					trueResult = 0;
 				} else if (dealerValue > 21 || playerValue > dealerValue) {
 					p.winBet();
-					network.backpropogate(1, LEARNING_RATE);
+					trueResult = 1;
+				} else {
+					trueResult = .5;
 				}
+				network.backpropogate(targetOutputNodeIndex, trueResult, LEARNING_RATE);
 				p.discardCards(discard);
 			}
 
 			System.out.println("Dealer: " + dealerCardValue());
+			System.out.println("True Result: " + trueResult);
 			dealerDiscard(discard);
 			// System.out.println("Hit: " + results.get(0) + " Stay: " + results.get(1));
 			deck.addCards(discard.getCards());
