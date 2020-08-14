@@ -57,9 +57,8 @@ public class Player {
 		return money;
 	}
 	
-	public void discardCards(Deck discard) {
-		discard.addCards(cards);
+	public void discardCards(Deck deck) {
+		deck.discardCards(cards);
 		cards.clear();
-		aces = 0;
 	}
 }

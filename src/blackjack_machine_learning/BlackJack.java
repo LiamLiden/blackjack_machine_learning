@@ -15,7 +15,7 @@ public class BlackJack {
 
 	private static int targetOutputNodeIndex;
 	private static double trueResult;
-	
+
 	public static void main(String[] args) {
 		// Setup neural network
 		ArrayList<Neuron> inputNodes = new ArrayList<Neuron>();
@@ -49,7 +49,6 @@ public class BlackJack {
 			deck.addCards(tempDeck.getCards());
 		}
 		deck.shuffle();
-		Deck discard = new Deck();
 
 		for (int i = 0; i < ITERATIONS; i++) {
 
@@ -104,16 +103,16 @@ public class BlackJack {
 					trueResult = .5;
 				}
 				network.backpropogate(targetOutputNodeIndex, trueResult, LEARNING_RATE);
-				p.discardCards(discard);
+				p.discardCards(deck);
 			}
 
 			System.out.println("Dealer: " + dealerCardValue());
 			System.out.println("True Result: " + trueResult);
-			dealerDiscard(discard);
+			dealerDiscard(deck);
 			// System.out.println("Hit: " + results.get(0) + " Stay: " + results.get(1));
-			deck.addCards(discard.getCards());
-			discard.clearDeck();
-			deck.shuffle();
+			if (deck.countDiscard() * 1.25 > deck.countCards()) {
+				deck.shuffle();
+			}
 		}
 		System.out.println("Accuracy: " + network.getAccuracy());
 		System.out.println("Money: " + players.get(0).getMoney());
@@ -140,11 +139,11 @@ public class BlackJack {
 		return val;
 	}
 
-	public static void dealerDiscard(Deck discard) {
-		discard.addCards(dealer);
+	public static void dealerDiscard(Deck deck) {
+		deck.discardCards(dealer);
 		dealer.clear();
 	}
-	
+
 	public static double scale(double originalMin, double originalMax, double newMin, double newMax, double value) {
 		return ((originalMax - originalMin) * (value - newMin)) / (newMax - newMin);
 	}

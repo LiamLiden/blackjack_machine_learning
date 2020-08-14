@@ -9,9 +9,11 @@ import blackjack_machine_learning.Card.Value;
 
 public class Deck {
 	private LinkedList<Card> cards;
+	private LinkedList<Card> discard;
 	
 	public Deck() {
 		cards = new LinkedList<Card>();
+		discard = new LinkedList<Card>();
 	}
 	
 	public void initializeDeck() {
@@ -26,6 +28,18 @@ public class Deck {
 		cards.addAll(newCards);
 	}
 	
+	public void discardCards(List<Card> cards) {
+		discard.addAll(cards);
+	}
+	
+	public int countCards() {
+		return cards.size();
+	}
+	
+	public int countDiscard() {
+		return discard.size();
+	}
+	
 	public LinkedList<Card> getCards() {
 		return cards;
 	}
@@ -36,6 +50,8 @@ public class Deck {
 	
 	public void shuffle() {
 		Collections.shuffle(cards);
+		cards.addAll(discard);
+		discard.clear();
 	}
 	
 	public void clearDeck() {
