@@ -6,7 +6,8 @@ import java.util.List;
 
 public class BlackJack {
 	private static final double LEARNING_RATE = 1;
-	private static final double NUMBER_OF_DECKS = 6;
+	private static final int NUMBER_OF_DECKS = 6;
+	private static final int ITERATIONS = 100000;
 	private static LinkedList<Card> dealer = new LinkedList<Card>();
 
 	private static int targetOutputNodeIndex;
@@ -47,7 +48,7 @@ public class BlackJack {
 		deck.shuffle();
 		Deck discard = new Deck();
 
-		for (int i = 0; i < 1000000; i++) {
+		for (int i = 0; i < ITERATIONS; i++) {
 
 			// Player bets
 			for (Player p : players) {
