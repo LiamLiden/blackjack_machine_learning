@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/// NOTES
+//  * Scaling input caused much better accuracy and increased the speed in which the model reached good results.
+
 public class BlackJack {
 	private static final double LEARNING_RATE = 1;
 	private static final int NUMBER_OF_DECKS = 6;
@@ -63,8 +66,10 @@ public class BlackJack {
 			while (players.get(0).cardsValue() <= 21) {
 				System.out.println("Player: " + players.get(0).cardsValue());
 				ArrayList<Double> inputs = new ArrayList<Double>();
-				inputs.add((double) dealerCardValue());
-				inputs.add((double) players.get(0).cardsValue());
+				// Scale the dealer input of range (0, 11) to range (0, 1)
+				inputs.add(scale(0, 11, 0, 1, (double) dealerCardValue()));
+				// Scale the player input of range (0, 21) to range (0, 1)
+				inputs.add(scale(0, 21, 0, 1, (double) players.get(0).cardsValue()));
 				ArrayList<Double> estimates = network.forwardpropogate(inputs);
 				if (estimates.get(0) > estimates.get(1)) {
 					targetOutputNodeIndex = 0;
@@ -138,5 +143,9 @@ public class BlackJack {
 	public static void dealerDiscard(Deck discard) {
 		discard.addCards(dealer);
 		dealer.clear();
+	}
+	
+	public static double scale(double originalMin, double originalMax, double newMin, double newMax, double value) {
+		return ((originalMax - originalMin) * (value - newMin)) / (newMax - newMin);
 	}
 }
