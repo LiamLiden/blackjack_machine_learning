@@ -8,9 +8,11 @@ import java.util.List;
 //  * Scaling input caused much better accuracy and increased the speed in which the model reached good results.
 
 public class BlackJack {
-	private static final double LEARNING_RATE = 1;
+	private static final double LEARNING_RATE = .25;
 	private static final int NUMBER_OF_DECKS = 6;
 	private static final int ITERATIONS = 100000;
+	private static final int NUMBER_OF_HIDDEN_LAYERS = 3;
+	private static final int HIDDEN_LAYER_WIDTH = 3;
 	private static LinkedList<Card> dealer = new LinkedList<Card>();
 
 	private static int targetOutputNodeIndex;
@@ -19,17 +21,45 @@ public class BlackJack {
 	public static void main(String[] args) {
 		// Setup neural network
 		ArrayList<Neuron> inputNodes = new ArrayList<Neuron>();
-		ArrayList<NeuronLayer> hiddenLayers = new ArrayList<NeuronLayer>();
+		ArrayList<ArrayList<Neuron>> hiddenLayers = new ArrayList<ArrayList<Neuron>>();
 		ArrayList<Neuron> outputNodes = new ArrayList<Neuron>();
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 3; i++) {
 			Neuron n = new Neuron();
 			inputNodes.add(n);
+		}
+
+		for (int i = 0; i < NUMBER_OF_HIDDEN_LAYERS; i++) {
+			ArrayList<Neuron> hiddenLayer = new ArrayList<Neuron>();
+
+			if (i == 0) {
+				for (int j = 0; j < HIDDEN_LAYER_WIDTH; j++) {
+					Neuron n = new Neuron();
+					hiddenLayer.add(n);
+					for (Neuron input : inputNodes) {
+						NeuronConnection newConnection = new NeuronConnection(input, n, Math.random());
+						n.inputConnections.add(newConnection);
+						input.outputConnections.add(newConnection);
+					}
+				}
+			} else {
+				for (int j = 0; j < HIDDEN_LAYER_WIDTH; j++) {
+					Neuron n = new Neuron();
+					hiddenLayer.add(n);
+					for (Neuron input : hiddenLayers.get(i - 1)) {
+						NeuronConnection newConnection = new NeuronConnection(input, n, Math.random());
+						n.inputConnections.add(newConnection);
+						input.outputConnections.add(newConnection);
+					}
+				}
+			}
+			hiddenLayers.add(hiddenLayer);
+
 		}
 
 		for (int i = 0; i < 2; i++) {
 			Neuron n = new Neuron();
 			outputNodes.add(n);
-			for (Neuron input : inputNodes) {
+			for (Neuron input : hiddenLayers.get(0)) {
 				NeuronConnection newConnection = new NeuronConnection(input, n, Math.random());
 				n.inputConnections.add(newConnection);
 				input.outputConnections.add(newConnection);
@@ -65,10 +95,18 @@ public class BlackJack {
 			while (players.get(0).cardsValue() <= 21) {
 				System.out.println("Player: " + players.get(0).cardsValue());
 				ArrayList<Double> inputs = new ArrayList<Double>();
+				// Inputs: DealerValue, PlayerValue, AcePresent
 				// Scale the dealer input of range (0, 11) to range (0, 1)
 				inputs.add(scale(0, 11, 0, 1, (double) dealerCardValue()));
 				// Scale the player input of range (0, 21) to range (0, 1)
 				inputs.add(scale(0, 21, 0, 1, (double) players.get(0).cardsValue()));
+				if (players.get(0).getAces() == 0) {
+					inputs.add((double) 0);
+				}
+				else {
+					inputs.add((double) 1);
+				}
+				
 				ArrayList<Double> estimates = network.forwardpropogate(inputs);
 				if (estimates.get(0) > estimates.get(1)) {
 					targetOutputNodeIndex = 0;

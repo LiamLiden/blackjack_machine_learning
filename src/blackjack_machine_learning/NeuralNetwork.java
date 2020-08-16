@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 public class NeuralNetwork {
 	public ArrayList<Neuron> inputNodes;
-	public ArrayList<NeuronLayer> hiddenLayers;
+	public ArrayList<ArrayList<Neuron>> hiddenLayers;
 	public ArrayList<Neuron> outputNodes;
 	
 	private double success;
 	private double total;
 		
-	public NeuralNetwork(ArrayList<Neuron> inputNodes, ArrayList<NeuronLayer> hiddenLayers, ArrayList<Neuron> outputNodes) {
+	public NeuralNetwork(ArrayList<Neuron> inputNodes, ArrayList<ArrayList<Neuron>> hiddenLayers, ArrayList<Neuron> outputNodes) {
 		this.inputNodes = inputNodes;
 		this.hiddenLayers = hiddenLayers;
 		this.outputNodes = outputNodes;
